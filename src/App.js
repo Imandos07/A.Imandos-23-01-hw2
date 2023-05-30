@@ -1,25 +1,68 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
-function App() {
+const PostList = () => {
+  const [posts, setPosts] = useState([]);
+  const [newPost, setNewPost] = useState({
+    title: '',
+    userId: 1,
+  });
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  const fetchPosts = async () => {
+    try {
+      const response = await axios.get('https://dummyjson.com/posts');
+      setPosts(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const createPost = async () => {
+    try {
+      const response = await axios.post('https://dummyjson.com/posts/add', newPost);
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  
+
+  const handleInputChange = (event) => {
+    setNewPost({ ...newPost, [event.target.name]: event.target.value });
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h1>Создание поста</h1>
+      <form>
+        <label>
+          Заголовок:
+          <input
+            type="text"
+            name="title"
+            value={newPost.title}
+            onChange={handleInputChange}
+          />
+        </label>
+        <br />
+        <button type="button" onClick={createPost}>Создать пост</button>
+      </form>
+
+      <h1>Список постов</h1>
+      <ul>
+        {Array.isArray(posts) && posts.map((post) => (
+          <li key={post.id}>
+            {post.title}
+          </li>
+        ))}
+      </ul>
     </div>
   );
-}
+};
 
-export default App;
+export default PostList;
+
